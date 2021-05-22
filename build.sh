@@ -1,4 +1,1 @@
-aws --endpoint-url=http://localhost:4566 cloudformation deploy \
-    --no-fail-on-empty-changeset \
-    --template-file template.yml \
-    --stack-name paul \
+aws cloudformation create-stack --stack-name paul2 --template-body file://template.yml --endpoint-url http://localhost:4566
