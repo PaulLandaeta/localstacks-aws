@@ -1,25 +1,24 @@
+Uploading to cc766e6105e4001830ee59927f49e9a1  689 / 689.0  (100.00%)
 AWSTemplateFormatVersion: '2010-09-09'
-Transform:
-  - AWS::Serverless-2016-10-31
 Resources:
-
   HelloLambdaRole:
     Type: AWS::IAM::Role
     Properties:
       RoleName: HelloLambdaRole
       AssumeRolePolicyDocument:
         Statement:
-          - Effect: Allow
-            Principal:
-              Service: lambda.amazonaws.com
-            Action: sts:AssumeRole
-                
-
+        - Effect: Allow
+          Principal:
+            Service: lambda.amazonaws.com
+          Action: sts:AssumeRole
   HelloLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: HelloLambdaFunction
-      Role: !GetAtt HelloLambdaRole.Arn
+      Role:
+        Fn::GetAtt:
+        - HelloLambdaRole
+        - Arn
       Runtime: python3.7
       Handler: event.lambda_handler
-      CodeUri: ./src
+      CodeUri: s3://mycode-plandaeta/cc766e6105e4001830ee59927f49e9a1

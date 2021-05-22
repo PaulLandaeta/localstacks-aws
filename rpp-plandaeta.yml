@@ -1,64 +1,25 @@
 AWSTemplateFormatVersion: '2010-09-09'
+Transform:
+- AWS::Serverless-2016-10-31
 Resources:
-  myDynamoDBTable:
-    Type: AWS::DynamoDB::Table
+  HelloLambdaRole:
+    Type: AWS::IAM::Role
     Properties:
-      AttributeDefinitions:
-      - AttributeName: Album
-        AttributeType: S
-      - AttributeName: Artist
-        AttributeType: S
-      - AttributeName: Sales
-        AttributeType: N
-      - AttributeName: NumberOfSongs
-        AttributeType: N
-      KeySchema:
-      - AttributeName: Album
-        KeyType: HASH
-      - AttributeName: Artist
-        KeyType: RANGE
-      ProvisionedThroughput:
-        ReadCapacityUnits: '5'
-        WriteCapacityUnits: '5'
-      TableName: myTableName
-      GlobalSecondaryIndexes:
-      - IndexName: myGSI
-        KeySchema:
-        - AttributeName: Sales
-          KeyType: HASH
-        - AttributeName: Artist
-          KeyType: RANGE
-        Projection:
-          NonKeyAttributes:
-          - Album
-          - NumberOfSongs
-          ProjectionType: INCLUDE
-        ProvisionedThroughput:
-          ReadCapacityUnits: '5'
-          WriteCapacityUnits: '5'
-      - IndexName: myGSI2
-        KeySchema:
-        - AttributeName: NumberOfSongs
-          KeyType: HASH
-        - AttributeName: Sales
-          KeyType: RANGE
-        Projection:
-          NonKeyAttributes:
-          - Album
-          - Artist
-          ProjectionType: INCLUDE
-        ProvisionedThroughput:
-          ReadCapacityUnits: '5'
-          WriteCapacityUnits: '5'
-      LocalSecondaryIndexes:
-      - IndexName: myLSI
-        KeySchema:
-        - AttributeName: Album
-          KeyType: HASH
-        - AttributeName: Sales
-          KeyType: RANGE
-        Projection:
-          NonKeyAttributes:
-          - Artist
-          - NumberOfSongs
-          ProjectionType: INCLUDE
+      RoleName: HelloLambdaRole
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: lambda.amazonaws.com
+          Action: sts:AssumeRole
+  HelloLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: HelloLambdaFunction
+      Role:
+        Fn::GetAtt:
+        - HelloLambdaRole
+        - Arn
+      Runtime: python3.7
+      Handler: event.lambda_handler
+      CodeUri: s3://mycode-plandaeta/cc766e6105e4001830ee59927f49e9a1
