@@ -9,16 +9,22 @@ GET = 'GET'
 
 def lambda_handler(event, context):
     httpMethod = event['httpMethod']
-
-    if httpMethod == GET:
-        return get_dosificacion(event)
-    else:
-        return insert_dosificacion(event)
+    try:
+        if httpMethod == GET:
+            return get_dosificacion(event)
+        else:
+            return insert_dosificacion(event)
+    except ClientError as e:
+        return {
+            'statusCode': 401,
+            'error_message': e.response['Error']['Message']
+        }
 
 
 def get_dosificacion(event):
+    # TODO get the dosificacion a partir del key (dosif_nro_autorizacion+)
     return {
-        'statusCode': 200,
+        'statusCode': 401,
         'body': json.dumps({"dosificacion": "1111111111111", "event": event})
     }
 
@@ -32,12 +38,14 @@ def insert_dosificacion(event):
     try:
 
         dynamodb.put_item(TableName='Dosificacion', Item={'Id_dosificacion': {
-                          'S': control}, 'key2': {'S': event['body']}})
+                          'S': control}, 'event': {'S': event['body']}})
 
         return {
             'statusCode': 200,
-            'body': json.dumps({"dosificacion": "1111111111111", "temp": control})
+            'body': json.dumps({"dosificacion": control, "event": event['body']})
         }
     except ClientError as e:
-
-        print(e.response['Error']['Message'])
+        return {
+            'statusCode': 401,
+            'error_message': e.response['Error']['Message']
+        }
