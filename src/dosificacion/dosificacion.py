@@ -6,19 +6,23 @@ GET = 'GET'
 
 def lambda_handler(event, context):
     # TODO implement
-    body = json.loads(event['body'])
+    
 
     httpMethod = event['httpMethod'] 
 
     if httpMethod == GET:
-        return get_dosificacion(body)
+        return get_dosificacion(event)
     else:
-        return insert_dosificacion(body)
+        return insert_dosificacion(event)
     
-def get_dosificacion(body):
-    return '1234567890'
+def get_dosificacion(event):
+    return {
+        'statusCode': 200,
+        'body': json.dumps({"dosificacion":"1111111111111", "event": event})
+    }
 
-def insert_dosificacion(body):
+def insert_dosificacion(event):
+    body = json.loads(event['body'])
     dosif_nit = body['dosif_nit']
     dosif_nro_autorizacion = body['dosif_nro_autorizacion']
     control = dosif_nit+dosif_nro_autorizacion

@@ -49,7 +49,25 @@ Resources:
       OperationName: 'lambda'
       ResourceId: !Ref ApiGatewayResource
       RestApiId: !Ref ApiGatewayRestApiDosificacion
-    
+  
+  ApiGatewayMethodGET:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      ApiKeyRequired: false
+      AuthorizationType: NONE
+      HttpMethod: GET
+      Integration:
+        ConnectionType: INTERNET
+        Credentials: !GetAtt ApiGatewayIamRole.Arn
+        IntegrationHttpMethod: POST
+        PassthroughBehavior: WHEN_NO_MATCH
+        TimeoutInMillis: 29000
+        Type: AWS_PROXY
+        Uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DosificacionLambdaFunction.Arn}/invocations'
+      OperationName: 'lambda'
+      ResourceId: !Ref ApiGatewayResource
+      RestApiId: !Ref ApiGatewayRestApiDosificacion
+
   ApiGatewayModel:
     Type: AWS::ApiGateway::Model
     Properties:
