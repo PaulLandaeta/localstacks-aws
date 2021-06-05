@@ -5,9 +5,6 @@ dynamodb = boto3.client('dynamodb')
 GET = 'GET'
 
 def lambda_handler(event, context):
-    # TODO implement
-    
-
     httpMethod = event['httpMethod'] 
 
     if httpMethod == GET:
@@ -24,6 +21,7 @@ def get_dosificacion(event):
 def insert_dosificacion(event):
     body = json.loads(event['body'])
     dosif_nit = body['dosif_nit']
+
     dosif_nro_autorizacion = body['dosif_nro_autorizacion']
     control = dosif_nit+dosif_nro_autorizacion
     dynamodb.put_item(TableName='Dosificacion', Item={'Id_dosificacion':{'S':control}})
