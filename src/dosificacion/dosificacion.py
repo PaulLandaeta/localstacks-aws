@@ -6,18 +6,20 @@ from botocore.exceptions import ClientError
 dynamodb = boto3.client('dynamodb')
 GET = 'GET'
 
+
 def lambda_handler(event, context):
-    httpMethod = event['httpMethod'] 
+    httpMethod = event['httpMethod']
 
     if httpMethod == GET:
         return get_dosificacion(event)
     else:
         return insert_dosificacion(event)
-    
+
+
 def get_dosificacion(event):
     return {
         'statusCode': 200,
-        'body': json.dumps({"dosificacion":"1111111111111", "event": event})
+        'body': json.dumps({"dosificacion": "1111111111111", "event": event})
     }
 
 
@@ -29,12 +31,12 @@ def insert_dosificacion(event):
     control = dosif_nit+dosif_nro_autorizacion
     try:
 
-        dynamodb.put_item(TableName='Dosificacion', Item={'Id_dosificacion':{'S':control},'key2':{'S':event['body']}})
-
+        dynamodb.put_item(TableName='Dosificacion', Item={'Id_dosificacion': {
+                          'S': control}, 'key2': {'S': event['body']}})
 
         return {
-        'statusCode': 200,
-        'body': json.dumps({"dosificacion":"1111111111111","temp":control})
+            'statusCode': 200,
+            'body': json.dumps({"dosificacion": "1111111111111", "temp": control})
         }
     except ClientError as e:
 
