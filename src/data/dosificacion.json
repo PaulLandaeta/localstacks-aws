@@ -1,0 +1,11 @@
+{
+    "dosif_suc_id": "q",
+    "dosif_nit": "11111111",
+    "dosif_nro_autorizacion": "2222222",
+    "dosif_nro_inicio": "1",
+    "dosif_nro_fin": "99999",
+    "dosif_llave": "llave de la dosificaion",
+    "dosif_tipo_ley": "dosif_tipo_ley",
+    "dosif_tipo_dosf": "dosif_tipo_dosf",
+    "dosif_fecha_limite": "20-06-2021"
+}
