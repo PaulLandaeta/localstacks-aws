@@ -1,6 +1,18 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform:
   - AWS::Serverless-2016-10-31
+
+Parameters:
+  HashKeyElementName:
+    Type: String
+    Default: Id_dosificacion
+    Description: Hash Key Name
+  HashKeyElementType:
+    Type: String
+    Default: S
+    Description: Hash Key Type
+
+
 Resources:
 
   ApiGatewayRestApiDosificacion:
@@ -83,9 +95,27 @@ Resources:
                 Action: 'lambda:*'
                 Resource: !GetAtt DosificacionLambdaFunction.Arn
 
+  LambdaPolicyDynamo:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+        PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+                -
+                  Effect: Allow
+                  Action:
+                      - dynamodb:PutItem
+                      - dynamodb:UpdateItem
+                      - dynamodb:GetItem
+                      - dynamodb:*
+                  Resource:
+                      - "*"
+
   DosificacionLambdaRole:
     Type: AWS::IAM::Role
     Properties:
+      ManagedPolicyArns:
+        - !Ref LambdaPolicyDynamo       
       RoleName: DosificacionLambdaRole
       AssumeRolePolicyDocument:
         Statement:
@@ -93,7 +123,6 @@ Resources:
             Principal:
               Service: lambda.amazonaws.com
             Action: sts:AssumeRole
-                
 
   DosificacionLambdaFunction:
     Type: AWS::Serverless::Function
@@ -103,3 +132,23 @@ Resources:
       Runtime: python3.7
       Handler: 'dosificacion/dosificacion.lambda_handler'
       CodeUri: ./src
+
+  EmployeeTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: Dosificacion
+      AttributeDefinitions:
+        - 
+          AttributeName: !Ref HashKeyElementName
+          AttributeType: !Ref HashKeyElementType
+      KeySchema:
+        - 
+          AttributeName: !Ref HashKeyElementName
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5 
+Outputs:
+  Dosificacion:
+    Description: Table Created using this template.
+    Value: !Ref EmployeeTable
