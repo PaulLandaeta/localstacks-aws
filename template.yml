@@ -3,7 +3,7 @@ Transform:
   - AWS::Serverless-2016-10-31
 Resources:
 
-  ApiGatewayRestApi:
+  ApiGatewayRestApiDosificacion:
     Type: AWS::ApiGateway::RestApi
     Properties:
       ApiKeySourceType: HEADER
@@ -16,9 +16,9 @@ Resources:
   ApiGatewayResource:
     Type: AWS::ApiGateway::Resource
     Properties:
-      ParentId: !GetAtt ApiGatewayRestApi.RootResourceId
+      ParentId: !GetAtt ApiGatewayRestApiDosificacion.RootResourceId
       PathPart: 'lambda'
-      RestApiId: !Ref ApiGatewayRestApi
+      RestApiId: !Ref ApiGatewayRestApiDosificacion
 
   ApiGatewayMethod:
     Type: AWS::ApiGateway::Method
@@ -33,16 +33,16 @@ Resources:
         PassthroughBehavior: WHEN_NO_MATCH
         TimeoutInMillis: 29000
         Type: AWS_PROXY
-        Uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HelloLambdaFunction.Arn}/invocations'
+        Uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DosificacionLambdaFunction.Arn}/invocations'
       OperationName: 'lambda'
       ResourceId: !Ref ApiGatewayResource
-      RestApiId: !Ref ApiGatewayRestApi
+      RestApiId: !Ref ApiGatewayRestApiDosificacion
     
   ApiGatewayModel:
     Type: AWS::ApiGateway::Model
     Properties:
       ContentType: 'application/json'
-      RestApiId: !Ref ApiGatewayRestApi
+      RestApiId: !Ref ApiGatewayRestApiDosificacion
       Schema: {}
 
   ApiGatewayStage:
@@ -50,7 +50,7 @@ Resources:
     Properties:
       DeploymentId: !Ref ApiGatewayDeployment
       Description: Lambda API Stage v0
-      RestApiId: !Ref ApiGatewayRestApi
+      RestApiId: !Ref ApiGatewayRestApiDosificacion
       StageName: 'v0'
 
   ApiGatewayDeployment:
@@ -58,7 +58,7 @@ Resources:
     DependsOn: ApiGatewayMethod
     Properties:
       Description: Lambda API Deployment
-      RestApiId: !Ref ApiGatewayRestApi
+      RestApiId: !Ref ApiGatewayRestApiDosificacion
    
   ApiGatewayIamRole:
     Type: AWS::IAM::Role
@@ -81,12 +81,12 @@ Resources:
             Statement:
               - Effect: 'Allow'
                 Action: 'lambda:*'
-                Resource: !GetAtt HelloLambdaFunction.Arn
+                Resource: !GetAtt DosificacionLambdaFunction.Arn
 
-  HelloLambdaRole:
+  DosificacionLambdaRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: HelloLambdaRole
+      RoleName: DosificacionLambdaRole
       AssumeRolePolicyDocument:
         Statement:
           - Effect: Allow
@@ -95,11 +95,11 @@ Resources:
             Action: sts:AssumeRole
                 
 
-  HelloLambdaFunction:
+  DosificacionLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: HelloLambdaFunction
-      Role: !GetAtt HelloLambdaRole.Arn
+      FunctionName: DosificacionLambdaFunction
+      Role: !GetAtt DosificacionLambdaRole.Arn
       Runtime: python3.7
-      Handler: event.lambda_handler
+      Handler: 'dosificacion/dosificacion.lambda_handler'
       CodeUri: ./src

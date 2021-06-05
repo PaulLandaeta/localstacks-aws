@@ -2,7 +2,7 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform:
 - AWS::Serverless-2016-10-31
 Resources:
-  ApiGatewayRestApi:
+  ApiGatewayRestApiDosificacion:
     Type: AWS::ApiGateway::RestApi
     Properties:
       ApiKeySourceType: HEADER
@@ -16,11 +16,11 @@ Resources:
     Properties:
       ParentId:
         Fn::GetAtt:
-        - ApiGatewayRestApi
+        - ApiGatewayRestApiDosificacion
         - RootResourceId
       PathPart: lambda
       RestApiId:
-        Ref: ApiGatewayRestApi
+        Ref: ApiGatewayRestApiDosificacion
   ApiGatewayMethod:
     Type: AWS::ApiGateway::Method
     Properties:
@@ -38,18 +38,18 @@ Resources:
         TimeoutInMillis: 29000
         Type: AWS_PROXY
         Uri:
-          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HelloLambdaFunction.Arn}/invocations
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DosificacionLambdaFunction.Arn}/invocations
       OperationName: lambda
       ResourceId:
         Ref: ApiGatewayResource
       RestApiId:
-        Ref: ApiGatewayRestApi
+        Ref: ApiGatewayRestApiDosificacion
   ApiGatewayModel:
     Type: AWS::ApiGateway::Model
     Properties:
       ContentType: application/json
       RestApiId:
-        Ref: ApiGatewayRestApi
+        Ref: ApiGatewayRestApiDosificacion
       Schema: {}
   ApiGatewayStage:
     Type: AWS::ApiGateway::Stage
@@ -58,7 +58,7 @@ Resources:
         Ref: ApiGatewayDeployment
       Description: Lambda API Stage v0
       RestApiId:
-        Ref: ApiGatewayRestApi
+        Ref: ApiGatewayRestApiDosificacion
       StageName: v0
   ApiGatewayDeployment:
     Type: AWS::ApiGateway::Deployment
@@ -66,7 +66,7 @@ Resources:
     Properties:
       Description: Lambda API Deployment
       RestApiId:
-        Ref: ApiGatewayRestApi
+        Ref: ApiGatewayRestApiDosificacion
   ApiGatewayIamRole:
     Type: AWS::IAM::Role
     Properties:
@@ -90,26 +90,26 @@ Resources:
             Action: lambda:*
             Resource:
               Fn::GetAtt:
-              - HelloLambdaFunction
+              - DosificacionLambdaFunction
               - Arn
-  HelloLambdaRole:
+  DosificacionLambdaRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: HelloLambdaRole
+      RoleName: DosificacionLambdaRole
       AssumeRolePolicyDocument:
         Statement:
         - Effect: Allow
           Principal:
             Service: lambda.amazonaws.com
           Action: sts:AssumeRole
-  HelloLambdaFunction:
+  DosificacionLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: HelloLambdaFunction
+      FunctionName: DosificacionLambdaFunction
       Role:
         Fn::GetAtt:
-        - HelloLambdaRole
+        - DosificacionLambdaRole
         - Arn
       Runtime: python3.7
-      Handler: event.lambda_handler
-      CodeUri: s3://mycode-plandaeta/90d435c948850d039fbbc9d3ac14c176
+      Handler: dosificacion/dosificacion.lambda_handler
+      CodeUri: s3://mycode-plandaeta/d646fb052588900cfe7a7cd1ac57cf4c
