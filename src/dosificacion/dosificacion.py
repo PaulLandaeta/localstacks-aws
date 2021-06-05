@@ -24,7 +24,7 @@ def lambda_handler(event, context):
 def get_dosificacion(event):
     # TODO get the dosificacion a partir del key (dosif_nro_autorizacion+)
     return {
-        'statusCode': 401,
+        'statusCode': 200,
         'body': json.dumps({"dosificacion": "1111111111111", "event": event})
     }
 
@@ -42,7 +42,7 @@ def insert_dosificacion(event):
 
         return {
             'statusCode': 200,
-            'body': json.dumps({"dosificacion": control, "event": event['body']})
+            'body': json.dumps({"dosificacion": control, "event": body})
         }
     except ClientError as e:
         return {
