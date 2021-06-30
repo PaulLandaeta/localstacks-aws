@@ -11,7 +11,9 @@ Parameters:
     Type: String
     Default: S
     Description: Hash Key Type
-
+  MigrationQueue: 
+    Type : 'AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>'
+    Default: /rpp-migration-queue/latest/sqs/stream-arn
 
 Resources:
 
