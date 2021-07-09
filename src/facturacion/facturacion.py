@@ -3,7 +3,7 @@ def send_factura(factura):
     
 
 def lambda_handler(event, context): 
-    """AWS Lambda Function entrypoint to cancel booking
+    """AWS Lambda Function entrypoint to create bill
 
     Parameters
     ----------
