@@ -1,0 +1,72 @@
+{
+    "name": "Practica_1",
+    "type": "record",
+    "fields": [
+      {
+        "name": "nombre",
+        "type": "string"
+      },
+      {
+        "name": "telefono",
+        "type": {
+          "type": "array",
+          "items": {
+            "name": "telefono_record",
+            "type": "record",
+            "fields": [
+              {
+                "name": "tipo",
+                "type": "enum",
+                "symbols" : ["FIJO", "MOVIL"]
+              },
+              {
+                "name": "numero",
+                "type": "int"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "name": "direccion",
+        "type": {
+          "name": "direccion",
+          "type": "record",
+          "fields": [
+            {
+              "name": "tipo_via",
+              "type": "string"
+            },
+            {
+              "name": "via_principal",
+              "type": "string"
+            },
+            {
+              "name": "nro_vivienda",
+              "type": "int"
+            }
+          ]
+        }
+      },
+      {
+        "name": "asistencia",
+        "type": {
+          "type": "array",
+          "items": {
+            "name": "asistencia_record",
+            "type": "record",
+            "fields": [
+              {
+                "name": "nombre",
+                "type": "string"
+              },
+              {
+                "name": "Presente",
+                "type": "boolean"
+              }
+            ]
+          }
+        }
+      }
+    ]
+  }

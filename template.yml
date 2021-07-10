@@ -18,6 +18,30 @@ Parameters:
 
 Resources:
 
+  LambdaLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/${InvoiceLambda}"
+      RetentionInDays: 7
+  
+  LambdaLogPermissions:
+    Type: AWS::IAM::Policy
+    Properties:
+      Roles:
+      - !Ref FacturacionLambdaRole
+      PolicyName: !Sub "${AWS::Region}-LambdaLogGroup"
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Action:
+          - logs:CreateLogStream
+          - logs:PutLogEvents
+          Resource:
+          - !Sub "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${InvoiceLambda}"
+          - !Sub "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${InvoiceLambda}:*"
+          - !Sub "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${InvoiceLambda}:*:*"
+
   ApiGatewayRestApiDosificacion:
     Type: AWS::ApiGateway::RestApi
     Properties:
