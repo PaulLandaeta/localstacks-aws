@@ -22,6 +22,23 @@ def send_factura(queue_name,msg_body):
     return msg
 
 
+def validar_informacion(event):
+    body = json.loads(event['body'])
+    ci_nit = body['ci_nit']
+    razon_social = body['razon_social']
+    idSucursal = body['idSucursal']
+    efectivo = body['efectivo']
+    if not ci_nit:
+        return ("Factura Invalida")
+    if not razon_social:
+        return ("Factura Invalida")
+    if not idSucursal:
+        return ("Factura Invalida")
+    if not efectivo:
+        return ("Factura Invalida")
+
+    return ("Facturar")
+
 def lambda_handler(event, context): 
     """AWS Lambda Function entrypoint to create bill
 
@@ -39,21 +56,16 @@ def lambda_handler(event, context):
     boolean
 
     """
+    body = json.loads(event['body'])
+    queue_name = 'DemoStandardQueue'
+
     valida = validar_informacion(event)
-    if valida !':
+    if valida != 'Facturar':
          return {
-            'statusCode': 200,
+            'statusCode': 401,
             'body': valida
         }
 
-    body = json.loads(event['body'])
-    factura_id = body.get("facturaId")
-    queue_name = 'DemoStandardQueue'
-
-    
-    
-    if not factura_id:
-        raise ValueError("Factura Invalida")
     try:
         
         msg = send_factura(queue_name,event)
@@ -68,21 +80,3 @@ def lambda_handler(event, context):
             'error_message': err.response['Error']['Message']
         }
 
-def validar_informacion(event):
-
-
-    body = json.loads(event['body'])
-    ci_nit = body['ci_nit']
-    razon_social = body['razon_social']
-    idSucursal = body['idSucursal']
-    efectivo = body['efectivo']
-    if not ci_nit:
-        return ("Factura Invalida")
-    if not razon_social:
-        return ("Factura Invalida")
-    if not idSucursal:
-        return ("Factura Invalida")
-    if not efectivo:
-        return ("Factura Invalida")
-
-    return ("Facturar")
