@@ -1,0 +1,30 @@
+{
+    "ci_nit": 0,
+    "razon_social": "SIN NOMBRE",
+    "idUsuario": 341,
+    "idSucursal": 154,
+    "efectivo": 75,
+    "detalles": [
+        {
+            "concepto": "CE-CIRUGIA GENERAL",
+            "cantidad": 1,
+            "monto": 25,
+            "concepto_id": 7807,
+            "sub_total": 25
+            
+        },
+        {
+            "concepto": "CE-CIRUGIA GENERAL II",
+            "cantidad": 2,
+            "monto": 25,
+            "concepto_id": 7807,
+            "sub_total": 50
+            
+        }
+
+    ],
+    "codigo": "HCoP07-261236",
+    "correo": "",
+    "odm_transaccion": "345-2020"
+    
+  }
