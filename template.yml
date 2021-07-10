@@ -289,6 +289,22 @@ Resources:
     Properties: 
       QueueName: !Ref StandardQueueName 
 
+  InvoiceLambda: 
+      Type: AWS::Serverless::Function
+      Properties:
+        CodeUri: ./src
+        Handler: 'mail/mail.lambda_handler'
+        Runtime: python3.8
+        Timeout: 30
+        FunctionName: invoice-mail-process
+        MemorySize: 512
+        Role: !GetAtt FacturacionLambdaRole.Arn
+        Events:
+          MyStandardQueue:
+            Type: SQS
+            Properties:
+              Queue: !Sub 'arn:aws:sqs:us-east-1:556356385512:DemoStandardQueue'
+              BatchSize: 10
 
 Outputs:
   Dosificacion:
