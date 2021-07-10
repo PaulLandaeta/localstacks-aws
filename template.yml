@@ -11,6 +11,10 @@ Parameters:
     Type: String
     Default: S
     Description: Hash Key Type
+  StandardQueueName:
+    Type: String
+    Description: Standard Queue Name
+    Default: DemoStandardQueue
 
 Resources:
 
@@ -192,6 +196,20 @@ Resources:
                 Resource: 
                   - !GetAtt DosificacionLambdaFunction.Arn
                   - !GetAtt FacturacionLambdaFunction.Arn
+              - Effect: 'Allow'
+                Action:
+                  - sqs:ChangeMessageVisibility
+                  - sqs:DeleteMessage
+                  - sqs:ReceiveMessage
+                  - sqs:GetQueueAttributes
+                  - sqs:GetQueueUrl
+                  - sqs:ListQueues
+                  - sqs:SendMessage
+                  - sqs:SendMessageBatch
+                  - sqs:GetQueueUrl
+                  - sqs:CreateQueue
+                Resource:
+                  - !Sub 'arn:aws:sqs:us-east-1:556356385512:DemoStandardQueue*'
 
   LambdaPolicyDynamo:
     Type: AWS::IAM::ManagedPolicy
@@ -245,8 +263,18 @@ Resources:
           KeyType: HASH
       ProvisionedThroughput:
         ReadCapacityUnits: 5
-        WriteCapacityUnits: 5 
+        WriteCapacityUnits: 5
+
+  MyStandardQueue: 
+    Type: AWS::SQS::Queue
+    Properties: 
+      QueueName: !Ref StandardQueueName 
+
+
 Outputs:
   Dosificacion:
     Description: Table Created using this template.
     Value: !Ref EmployeeTable
+  StandardQueueURL:
+    Description: Queue URL for standard queue
+    Value: !Ref MyStandardQueue
