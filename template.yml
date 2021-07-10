@@ -11,9 +11,6 @@ Parameters:
     Type: String
     Default: S
     Description: Hash Key Type
-  MigrationQueue: 
-    Type : 'AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>'
-    Default: /rpp-migration-queue/latest/sqs/stream-arn
 
 Resources:
 
@@ -25,14 +22,93 @@ Resources:
       EndpointConfiguration:
         Types:
           - EDGE
-      Name: lambda-api
-
+      Name: dosificacion
+  
   ApiGatewayResource:
     Type: AWS::ApiGateway::Resource
     Properties:
       ParentId: !GetAtt ApiGatewayRestApiDosificacion.RootResourceId
       PathPart: 'lambda'
       RestApiId: !Ref ApiGatewayRestApiDosificacion
+  
+  ApiGatewayRestApiFacturacion:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      ApiKeySourceType: HEADER
+      Description: An API Gateway with a Lambda Integration for
+      EndpointConfiguration:
+        Types:
+          - EDGE
+      Name: facturacion
+
+  ApiGatewayResourceFacturacion:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId: !GetAtt ApiGatewayRestApiFacturacion.RootResourceId
+      PathPart: 'facturacion'
+      RestApiId: !Ref ApiGatewayRestApiFacturacion
+  
+  ApiGatewayMethodFacturacion:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      ApiKeyRequired: false
+      AuthorizationType: NONE
+      HttpMethod: POST
+      Integration:
+        ConnectionType: INTERNET
+        Credentials: !GetAtt ApiGatewayIamRole.Arn
+        IntegrationHttpMethod: POST
+        PassthroughBehavior: WHEN_NO_MATCH
+        TimeoutInMillis: 29000
+        Type: AWS_PROXY
+        Uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${FacturacionLambdaFunction.Arn}/invocations'
+      OperationName: 'facturacion'
+      ResourceId: !Ref ApiGatewayResourceFacturacion
+      RestApiId: !Ref ApiGatewayRestApiFacturacion
+
+  FacturacionLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      ManagedPolicyArns:
+        - !Ref LambdaPolicyDynamo       
+      RoleName: FacturacionLambdaRole
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+
+  FacturacionLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: FacturacionLambdaFunction
+      Role: !GetAtt FacturacionLambdaRole.Arn
+      Runtime: python3.7
+      Handler: 'facturacion/facturacion.lambda_handler'
+      CodeUri: ./src
+  
+  ApiGatewayModelFacturacion:
+    Type: AWS::ApiGateway::Model
+    Properties:
+      ContentType: 'application/json'
+      RestApiId: !Ref ApiGatewayRestApiFacturacion
+      Schema: {}
+
+  ApiGatewayStage:
+    Type: AWS::ApiGateway::Stage
+    Properties:
+      DeploymentId: !Ref ApiGatewayDeploymentFacturacion
+      Description: Lambda API Stage v0
+      RestApiId: !Ref ApiGatewayRestApiFacturacion
+      StageName: 'v0'
+
+  ApiGatewayDeploymentFacturacion:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn: ApiGatewayMethodFacturacion
+    Properties:
+      Description: Lambda API Deployment
+      RestApiId: !Ref ApiGatewayRestApiFacturacion
 
   ApiGatewayMethod:
     Type: AWS::ApiGateway::Method
@@ -113,7 +189,9 @@ Resources:
             Statement:
               - Effect: 'Allow'
                 Action: 'lambda:*'
-                Resource: !GetAtt DosificacionLambdaFunction.Arn
+                Resource: 
+                  - !GetAtt DosificacionLambdaFunction.Arn
+                  - !GetAtt FacturacionLambdaFunction.Arn
 
   LambdaPolicyDynamo:
     Type: AWS::IAM::ManagedPolicy

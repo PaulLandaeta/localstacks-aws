@@ -1,6 +1,10 @@
+import json
+import boto3
+from botocore.exceptions import ClientError
 
 def send_factura(factura):
-    
+    print('test')
+
 
 def lambda_handler(event, context): 
     """AWS Lambda Function entrypoint to create bill
@@ -19,14 +23,23 @@ def lambda_handler(event, context):
     boolean
 
     """
-
-    factura_id = event.get("facturaId")
+    body = json.loads(event['body'])
+    factura_id = body.get("facturaId")
+    
     if not factura_id:
         raise ValueError("Factura Invalida")
-
     try:
         
         # response = send_factura(factura)
-        return { 'code': 200, "message": "Factura enviada a la cola"}
-    except Exception as err:
-        raise ValueError({"operation": "failed send the queue"})
+
+        
+        return {
+            'statusCode': 200,
+            'body': json.dumps({"message": 'Factura enviada a la cola', "event": body})
+        }
+    
+    except ClientError as err:
+        return {
+            'statusCode': 401,
+            'error_message': err.response['Error']['Message']
+        }
