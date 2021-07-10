@@ -4,7 +4,6 @@ from botocore.exceptions import ClientError
 
 def send_factura(queue_name,msg_body):
     """
-
     :param sqs_queue_url: String URL of existing SQS queue
     :param msg_body: String message body
     :return: Dictionary containing information about the sent message. If
@@ -13,12 +12,12 @@ def send_factura(queue_name,msg_body):
 
     # Send the SQS message
     sqs_client = boto3.client('sqs')    
-    sqs_queue_url = sqs_client.get_queue_url( QueueName=queue_name)['QueueUrl'] 
+    sqs_queue_url = 'https://sqs.us-east-1.amazonaws.com/556356385512/DemoStandardQueue'
     try:
         msg = sqs_client.send_message(QueueUrl=sqs_queue_url,
                                       MessageBody=json.dumps(msg_body)) 
     except ClientError as e:
-        return None
+        return e.response['Error']['Message']
     return msg
 
 

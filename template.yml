@@ -73,16 +73,36 @@ Resources:
   FacturacionLambdaRole:
     Type: AWS::IAM::Role
     Properties:
-      ManagedPolicyArns:
-        - !Ref LambdaPolicyDynamo       
-      RoleName: FacturacionLambdaRole
+      RoleName: facturacion-lambda-role
       AssumeRolePolicyDocument:
+        Version: "2012-10-17"
         Statement:
-          - Effect: Allow
-            Principal:
-              Service: lambda.amazonaws.com
-            Action: sts:AssumeRole
-
+        - Effect: Allow
+          Principal:
+            Service:
+              - lambda.amazonaws.com
+          Action:
+            - sts:AssumeRole
+      Policies:
+        - PolicyName: facturacion-lambda-policy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - sqs:ChangeMessageVisibility
+                  - sqs:DeleteMessage
+                  - sqs:ReceiveMessage
+                  - sqs:GetQueueAttributes
+                  - sqs:GetQueueUrl
+                  - sqs:ListQueues
+                  - sqs:SendMessage
+                  - sqs:SendMessageBatch
+                  - sqs:GetQueueUrl
+                  - sqs:CreateQueue
+                Resource:
+                  - !Sub 'arn:aws:sqs:us-east-1:556356385512:DemoStandardQueue'
+              
   FacturacionLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -206,10 +226,9 @@ Resources:
                   - sqs:ListQueues
                   - sqs:SendMessage
                   - sqs:SendMessageBatch
-                  - sqs:GetQueueUrl
                   - sqs:CreateQueue
                 Resource:
-                  - !Sub 'arn:aws:sqs:us-east-1:556356385512:DemoStandardQueue*'
+                  - !Sub 'arn:aws:sqs:us-east-1:556356385512:DemoStandardQueue'
 
   LambdaPolicyDynamo:
     Type: AWS::IAM::ManagedPolicy
